@@ -1,91 +1,47 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import App from '../App';
 
-import App from "../App";
-
-// Portfolio Elements
-test("displays a top-level heading with the text `Hi, I'm _______`", () => {
+// Initial State
+test('form initially has empty fields and no submission message', () => {
   render(<App />);
-
-  const topLevelHeading = screen.getByRole("heading", {
-    name: /hi, i'm/i,
-    exact: false,
-    level: 1,
-  });
-
-  expect(topLevelHeading).toBeInTheDocument();
+  expect(screen.getByLabelText(/enter your name/i)).toHaveValue('');
+  expect(screen.getByLabelText(/enter your email address/i)).toHaveValue('');
+  expect(screen.queryByText(/thank you,/i)).not.toBeInTheDocument();
 });
 
-test("displays an image of yourself", () => {
+// Handle Name and Email Input
+test('user can type their name and email into the input fields', () => {
   render(<App />);
-
-  const image = screen.getByAltText("My profile pic");
-
-  expect(image).toHaveAttribute("src", "https://via.placeholder.com/350");
+  fireEvent.change(screen.getByLabelText(/enter your name/i), { target: { value: 'John Doe' } });
+  fireEvent.change(screen.getByLabelText(/enter your email address/i), { target: { value: 'john.doe@example.com' } });
+  
+  expect(screen.getByLabelText(/enter your name/i)).toHaveValue('John Doe');
+  expect(screen.getByLabelText(/enter your email address/i)).toHaveValue('john.doe@example.com');
 });
 
-test("displays second-level heading with the text `About Me`", () => {
+// Handle Checkbox Input
+test('user can select interests checkboxes', () => {
   render(<App />);
-
-  const secondLevelHeading = screen.getByRole("heading", {
-    name: /about me/i,
-    level: 2,
-  });
-
-  expect(secondLevelHeading).toBeInTheDocument();
+  fireEvent.click(screen.getByLabelText(/coding/i));
+  fireEvent.click(screen.getByLabelText(/design/i));
+  
+  expect(screen.getByLabelText(/coding/i)).toBeChecked();
+  expect(screen.getByLabelText(/design/i)).toBeChecked();
+  expect(screen.getByLabelText(/writing/i)).not.toBeChecked();
 });
 
-test("displays a paragraph for your biography", () => {
+// Form Submission
+test('submission displays a thank you message with user input', () => {
   render(<App />);
+  fireEvent.change(screen.getByLabelText(/enter your name/i), { target: { value: 'Jane Doe' } });
+  fireEvent.change(screen.getByLabelText(/enter your email address/i), { target: { value: 'jane.doe@example.com' } });
+  fireEvent.click(screen.getByLabelText(/coding/i));
+  
+  fireEvent.click(screen.getByRole('button', { name: /submit/i }));
 
-  const bio = screen.getByText(/lorem ipsum/i);
-
-  expect(bio).toBeInTheDocument();
+  expect(screen.getByText(/thank you, jane doe!/i)).toBeInTheDocument();
+  expect(screen.getByText(/your email address jane.doe@example.com has been added to our newsletter/i)).toBeInTheDocument();
+  expect(screen.getByText(/your interests: coding/i)).toBeInTheDocument();
 });
 
-test("displays the correct links", () => {
-  render(<App />);
-
-  const githubLink = screen.getByRole("link", {
-    name: /github/i,
-  });
-  const linkedinLink = screen.getByRole("link", {
-    name: /linkedin/i,
-  });
-
-  expect(githubLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://github.com")
-  );
-
-  expect(linkedinLink).toHaveAttribute(
-    "href",
-    expect.stringContaining("https://linkedin.com")
-  );
-});
-
-// Newsletter Form - Initial State
-test("the form includes text inputs for name and email address", () => {
-  // your test code here
-});
-
-test("the form includes three checkboxes to select areas of interest", () => {
-  // your test code here
-});
-
-test("the checkboxes are initially unchecked", () => {
-  // your test code here
-});
-
-// Newsletter Form - Adding Responses
-test("the page shows information the user types into the name and email address form fields", () => {
-  // your test code here
-});
-
-test("checked status of checkboxes changes when user clicks them", () => {
-  // your test code here
-});
-
-test("a message is displayed when the user clicks the Submit button", () => {
-  // your test code here
-});

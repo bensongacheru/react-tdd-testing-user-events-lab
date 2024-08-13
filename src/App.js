@@ -1,24 +1,98 @@
-function App() {
-  return (
-    <main>
-      <h1>Hi, I'm (your name)</h1>
-      <img alt="My profile pic" src="https://via.placeholder.com/350" />
-      <h2>About Me</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
-      </p>
+import React, { useState } from 'react';
 
-      <div>
-        <a href="https://github.com">GitHub</a>
-        <a href="https://linkedin.com">LinkedIn</a>
-      </div>
-    </main>
+function App() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [interests, setInterests] = useState({
+    coding: false,
+    design: false,
+    writing: false
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleNameChange = (e) => setName(e.target.value);
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handleInterestChange = (e) => {
+    const { name, checked } = e.target;
+    setInterests(prevInterests => ({ ...prevInterests, [name]: checked }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  const interestList = Object.entries(interests)
+    .filter(([_, checked]) => checked)
+    .map(([interest]) => interest)
+    .join(', ');
+
+  return (
+    <div>
+      <h1>Newsletter Signup</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={handleNameChange}
+            aria-label="Enter your name"
+          />
+        </div>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={handleEmailChange}
+            aria-label="Enter your email address"
+          />
+        </div>
+        <fieldset>
+          <legend>Interests:</legend>
+          <div>
+            <input
+              type="checkbox"
+              id="coding"
+              name="coding"
+              checked={interests.coding}
+              onChange={handleInterestChange}
+            />
+            <label htmlFor="coding">Coding</label>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="design"
+              name="design"
+              checked={interests.design}
+              onChange={handleInterestChange}
+            />
+            <label htmlFor="design">Design</label>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="writing"
+              name="writing"
+              checked={interests.writing}
+              onChange={handleInterestChange}
+            />
+            <label htmlFor="writing">Writing</label>
+          </div>
+        </fieldset>
+        <button type="submit">Submit</button>
+      </form>
+      {submitted && (
+        <p>
+          Thank you, {name}! Your email address {email} has been added to our
+          newsletter. Your interests: {interestList}.
+        </p>
+      )}
+    </div>
   );
 }
 
